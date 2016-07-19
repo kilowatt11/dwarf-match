@@ -1,41 +1,80 @@
-;(function () {
+; (function () {
   angular.module('dwarfMatch')
     .component('gameComponent', {
       controller: GameController,
       templateUrl: 'app/components/game/game.html'
     })
 
-  function GameController ($timeout, GameService) {
+  function GameController($timeout, GameService) {
     var gc = this
 
-    // This is a freebie we are using the GameService to help keep our controller clean. The GameServie will be in charge of creating and shuffling the deck.
     gc.deck = GameService.getDeck()
 
-    // Create two card variables. These will be responsible
-    // for keeping track of our selections as we click cards.
+    gc.card1 = null;
+    gc.card2 = null;
 
-    // Next we need to initate a few more variables on gc for later use
-    // Let's add variables for tracking the number of guesses (pairs flipped),
-    // for the total number of correct guesses (pairs matched) and finally a
-    // victory boolean to let our controller know if we've won. Refer to the index.html
-    // for variable names
+    gc.attempts = 0;
+    gc.totalMatches = 0;
+    gc.victory = false;
 
-    // Next write a selectCard function on gc that accepts a card object on click and
-    // let's make it set card.show to true (boolean). Give it a test!
-    // After you complete this refer back to readme.md
 
-    // Write a local resetCards function that will empty our card variables
-    // and increase the number of attempts
+    gc.selectCard = function (card) {
+      // debugger;
+      if (card.show == true || gc.card1 && gc.card2) {
+        return
+      }
+ 
+      if (gc.card1 == null) {
+        gc.card1 = card
+        gc.card1.show = true;
+        return
+      } else {
+      gc.card2 == null
+        gc.card2 = card;
+        gc.card2.show = true
+        var match = isMatch(gc.card1, gc.card2)
+      }
 
-    // Next write a local isMatch function that accepts our two cards and if the card titles 
-    // match, increases our totalMatches and returns true else returns false. After this refer 
-    // back to readme.md
+      debugger;
+      if (match) {
+        checkVictory();
+        resetCards();
+      } else {
+        $timeout(function () {
+          gc.card1.show = false;
+          gc.card2.show = false;
+          resetCards();
+        }, 1000);
 
+      }
+    }
+    function resetCards() {
+      // debugger
+      gc.card1 = null;
+      gc.card2 = null;
+      gc.attempts++;
+    }
+
+    function isMatch(card1, card2) {
+      if (card1.title === card2.title) {
+        gc.totalMatches++;
+        return true;
+      }
+      return false;
+
+    }
     // Finally, write a local checkVictory function that will set gc.victory = true if the totalMatches 
     // is half the length of the deck. Tip: the game deck array is available at gc.deck. When you're done
     // refer back to readme.md
-
+    function checkVictory() {
+      debugger;
+      var length = gc.deck.length / 2
+      if (gc.totalMatches == length) {
+        console.log(length)
+        gc.victory = true;
+      }
+    }
     // Bonus Challenge: Write a function on gc that can reset the game and add a button that calls it
 
   }
-}())
+} ())
